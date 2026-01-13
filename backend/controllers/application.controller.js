@@ -12,6 +12,11 @@ export const createApplication = async (req, res) => {
   try {
     const { ticketId } = req.body;
     const userId = req.user._id;
+    if (!req.user.isProfileComplete) {
+      return res.status(403).json({
+        message: "Complete your profile before sending requests"
+      });
+    }
 
     if (!ticketId) {
       return res.status(400).json({ message: "Ticket ID is required" });
@@ -47,7 +52,7 @@ export const createApplication = async (req, res) => {
     const existing = await Application.findOne({
       ticket: ticket._id,
       applicant: userId,
-      status:"PENDING"
+      status: "PENDING"
     });
 
     if (existing) {
@@ -221,7 +226,7 @@ export const updateApplicationStatus = async (req, res) => {
     });
 
   } catch (error) {
-    await session.abortTransaction().catch(() => {});
+    await session.abortTransaction().catch(() => { });
     session.endSession();
 
     console.error("Transaction error:", error);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Code, Github, ExternalLink, Sparkles, Linkedin, Globe, Phone, Zap, Building2, Mail, MapPin, Calendar, Users, Loader2 } from 'lucide-react';
+import { X, Code, Github, ExternalLink, Sparkles, Linkedin, Globe, Phone, Zap, Building2, Mail, MapPin, Calendar, Users,Trash2, Loader2 } from 'lucide-react';
 
 // --- EXACT SKILLS UI ---
 export const SkillsModal = ({ skills, onClose }: any) => (
@@ -70,7 +70,15 @@ export const UserProfileModal = ({ user, onClose }: any) => (
 );
 
 // --- EXACT TEAM DETAIL UI ---
-export const TeamDetailModal = ({ team, teamMembers, isLoadingMembers, onClose, openMemberProfile, getInitial, activeTab, onOpenRecommendations }: any) => (
+export const TeamDetailModal = ({ team,
+    teamMembers,
+    isLoadingMembers,
+    onClose,
+    openMemberProfile,
+    getInitial,
+    activeTab,
+    onOpenRecommendations,
+    onRemoveMember }: any) => (
     
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto" onClick={onClose}>
         <div className="bg-white w-full max-w-3xl rounded-[48px] p-6 sm:p-12 relative shadow-2xl text-black animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
@@ -88,7 +96,7 @@ export const TeamDetailModal = ({ team, teamMembers, isLoadingMembers, onClose, 
                             <div className="flex items-center gap-3"><Calendar size={18} /> {new Date(team.createdAt).toLocaleDateString()}</div>
                             <div className="flex items-center gap-3"><Users size={18} /> {team.members?.length} / {team.teamSize} Slots</div>
                         </div>
-                        <div>
+                        {/* <div>
                             <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Members</h4>
                             <div className="flex flex-wrap gap-2">
                                 {isLoadingMembers ? <Loader2 className="animate-spin" /> : teamMembers?.map((m: any, idx: number) => (
@@ -97,8 +105,53 @@ export const TeamDetailModal = ({ team, teamMembers, isLoadingMembers, onClose, 
                                         <span className="text-[10px] font-bold text-gray-600">{m.name}</span>
                                     </button>
                                 ))}
+                                
                             </div>
+                        </div> */}
+                        <div>
+    <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
+        Members
+    </h4>
+
+    <div className="flex flex-wrap gap-2">
+        {isLoadingMembers ? (
+            <Loader2 className="animate-spin" />
+        ) : (
+            teamMembers?.map((m: any) => (
+                <div
+                    key={m._id}
+                    className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100"
+                >
+                    <button
+                        onClick={() => openMemberProfile(m._id)}
+                        className="flex items-center gap-2"
+                    >
+                        <div className="w-5 h-5 rounded-full bg-black text-lime-custom flex items-center justify-center text-[7px] font-black">
+                            {getInitial(m.name)}
                         </div>
+                        <span className="text-[10px] font-bold text-gray-600">
+                            {m.name}
+                        </span>
+                    </button>
+
+                    {/* 🗑️ REMOVE MEMBER (ONLY FOR CREATED TAB) */}
+                    {activeTab === 'created' && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onRemoveMember(m._id);
+                            }}
+                            className="ml-1 text-red-500 hover:text-red-700"
+                        >
+                            <Trash2 size={12} />
+                        </button>
+                    )}
+                </div>
+            ))
+        )}
+    </div>
+</div>
+
                     </div>
                     <div className="flex flex-col">
                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Hackathon Mission</h4>
@@ -121,10 +174,10 @@ export const TeamDetailModal = ({ team, teamMembers, isLoadingMembers, onClose, 
                         Hackathon <ExternalLink size={16} />
                     </button>
 
-                    {/* SHOW MANAGE BROADCAST ONLY IN CREATED TAB */}
+                    {/* SHOW MANAGE BROADCAST ONLY IN CREATED TAB
                     {activeTab === 'created' && (
                         <button className="flex-1 bg-black text-white py-4 rounded-full font-bold text-sm shadow-xl">Manage Broadcast</button>
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>
@@ -176,7 +229,7 @@ export const AIRecommendationsModal = ({ recommendations, isLoading, onClose, on
                             </div>
                             <button
                                 onClick={() => onSendRequest(rec.userId || rec._id)}
-                                className="w-full sm:w-auto px-8 py-3.5 bg-black text-white rounded-full font-bold text-xs uppercase tracking-widest hover:bg-lime-custom hover:text-black transition-all active:scale-95"
+                                className="w-full sm:w-auto px-8 py-3.5 bg-black text-white rounded-full font-bold text-xs uppercase tracking-widest hover:bg-lime-custom transition-all active:scale-95"
                             >
                                 Send Request
                             </button>

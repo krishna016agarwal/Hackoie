@@ -221,6 +221,7 @@ export const getHomeFeed = async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .populate("createdBy", "name college")
+      .populate("members", "name college branch year skills github linkedin phone email")
       .limit(50);
 
     /**
@@ -236,6 +237,7 @@ export const getHomeFeed = async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .populate("createdBy", "name college")
+       .populate("members", "name college branch year skills github linkedin phone email")
       .limit(50);
 
     /**

@@ -34,7 +34,7 @@ const Profile: React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [teamMembers, setTeamMembers] = useState<any[]>([]);
     const [isLoadingMembers, setIsLoadingMembers] = useState(false);
-
+    const [memberRemoved, setMemberRemoved] = useState(false);
     // --- AI RECOMMENDATION STATES ---
     const [showRecModal, setShowRecModal] = useState(false);
     const [recommendations, setRecommendations] = useState<any[]>([]);
@@ -198,7 +198,7 @@ const Profile: React.FC = () => {
     const fetchTeamMembers = async (ticketId: string) => {
         setIsLoadingMembers(true);
         try {
-         
+
             const res = await fetch(`${API_URL}/api/auth/ticket/${ticketId}/members`, {
                 headers: { 'Authorization': `Bearer ${auth.token}` }
             });
@@ -231,7 +231,45 @@ const Profile: React.FC = () => {
         finally { setIsUpdating(false); }
     };
 
+    const handleRemoveMember = async (memberId: string) => {
+        try {
+            const res = await fetch(
+                `${API_URL}/api/tickets/${selectedTeam._id}/member/${memberId}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${auth.token}`
+                    }
+                }
+            );
 
+            const data = await res.json();
+
+            if (data.status) {
+                setMessage(data.message);   // popup shown
+              
+                fetchTeamMembers(selectedTeam._id);
+                setMemberRemoved(true); // 🔔 trigger useEffect
+            } else {
+                setError(data.message || 'Failed to remove member');
+            }
+        } catch (err) {
+            setError('Failed to remove member');
+        }
+    };
+
+
+    useEffect(() => {
+        if (!memberRemoved) return;
+
+        const timer = setTimeout(() => {
+            fetchCreated();   // 🔄 refetch from backend
+
+            setMemberRemoved(false); // reset flag
+        }, 1500); // wait till popup is seen
+
+        return () => clearTimeout(timer);
+    }, [memberRemoved]);
 
 
 
@@ -324,6 +362,7 @@ const Profile: React.FC = () => {
                                         {team.members?.map((m: any, i: number) => (
                                             <div key={i} className="w-8 h-8 rounded-full border-2 border-black bg-lime-custom flex items-center justify-center text-black text-[10px] font-black shadow-sm">{getInitial(m.name)}</div>
                                         ))}
+
                                     </div>
                                     <button className="px-6 py-2 bg-white text-black hover:bg-lime-custom rounded-full font-bold text-xs transition-all active:scale-95">Manage</button>
                                 </div>
@@ -353,7 +392,7 @@ const Profile: React.FC = () => {
                                 <div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1"><Building2 size={12} className="text-lime-custom" /> {req.ticket?.hackathonName}</div>
                                 <p className="text-gray-500 text-xs mb-8 flex-grow italic line-clamp-2">"{req.ticket?.organization}"</p>
                                 <div className="flex gap-3 pt-6 border-t border-gray-50" onClick={e => e.stopPropagation()}>
-                                    <button onClick={() => handleRespondJoinRequest(req._id, 'ACCEPTED')} className="flex-1 bg-black text-white py-2.5 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-lime-custom hover:text-black transition-all">Accept</button>
+                                    <button onClick={() => handleRespondJoinRequest(req._id, 'ACCEPTED')} className="flex-1 bg-black text-white py-2.5 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-lime-custom  transition-all">Accept</button>
                                     <button onClick={() => handleRespondJoinRequest(req._id, 'REJECTED')} className="flex-1 bg-gray-100 text-gray-500 py-2.5 rounded-full font-bold text-[10px] uppercase tracking-widest">Ignore</button>
                                 </div>
                             </div>
@@ -395,7 +434,7 @@ const Profile: React.FC = () => {
             {showAllSkills && <SkillsModal skills={auth.user?.skills} onClose={() => setShowAllSkills(false)} />}
             {selectedUser && <UserProfileModal user={selectedUser} onClose={() => setSelectedUser(null)} />}
 
-            {selectedTeam && (
+            {/* {selectedTeam && (
                 <TeamDetailModal
                     team={selectedTeam}
                     teamMembers={teamMembers}
@@ -410,7 +449,26 @@ const Profile: React.FC = () => {
                     authUser={auth.user}
                     onOpenRecommendations={() => handleFetchRecommendations(selectedTeam._id)}
                 />
+            )} */}
+            {selectedTeam && (
+                <TeamDetailModal
+                    team={selectedTeam}
+                    teamMembers={teamMembers}
+                    isLoadingMembers={isLoadingMembers}
+                    onClose={() => setSelectedTeam(null)}
+                    openMemberProfile={(id: string) => {
+                        const m = teamMembers.find(member => member._id === id);
+                        if (m) setSelectedUser(m);
+                    }}
+                    getInitial={getInitial}
+                    activeTab={activeTab}
+                    onOpenRecommendations={() =>
+                        handleFetchRecommendations(selectedTeam._id)
+                    }
+                    onRemoveMember={handleRemoveMember}
+                />
             )}
+
             {showRecModal && (
                 <AIRecommendationsModal
                     recommendations={recommendations}

@@ -8,7 +8,11 @@ export const sendJoinRequest = async (req, res) => {
     try {
         const { ticketId, userId } = req.body;
         const requesterId = req.user._id;
-
+        if (!req.user.isProfileComplete) {
+            return res.status(403).json({
+                message: "Complete your profile before sending reuests"
+            });
+        }
         // 1️⃣ Validate ticket ownership
         const ticket = await Ticket.findById(ticketId);
         if (!ticket) {
@@ -216,7 +220,7 @@ export const respondToJoinRequest = async (req, res) => {
         });
 
     } catch (error) {
-    
+
         res.status(500).json({
             status: false,
             message: "Failed to respond to join request"
