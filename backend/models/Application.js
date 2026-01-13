@@ -37,5 +37,14 @@ applicationSchema.index(
     partialFilterExpression: { status: "ACCEPTED" }
   }
 );
-
+/**
+ * ✅ Prevent duplicate PENDING requests for same ticket
+ */
+applicationSchema.index(
+  { applicant: 1, ticket: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { status: "PENDING" }
+  }
+);
 export default mongoose.model("Application", applicationSchema);

@@ -86,6 +86,21 @@ export const getReceivedJoinRequests = async (req, res) => {
 
 };
 
+const safeInngestSend = async ({ ticketId, hackathonKey, joinedUserId }) => {
+    try {
+        await inngest.send({
+            name: "ticket/team.updated",
+            data: {
+                ticketId: ticketId.toString(),
+                hackathonKey,
+                joinedUserId: joinedUserId.toString()
+            }
+        });
+    } catch (err) {
+        console.error("Inngest failed (ignored):", err.message);
+        // ❌ DO NOTHING — DB & API should continue
+    }
+};
 
 
 // 📤 RESPOND TO REQUEST
@@ -114,7 +129,7 @@ export const respondToJoinRequest = async (req, res) => {
             });
         }
 
-        // 👉 If REJECTED → simple update
+        // 👉 REJECT FLOW
         if (status === "REJECTED") {
             request.status = "REJECTED";
             await request.save();
@@ -125,77 +140,88 @@ export const respondToJoinRequest = async (req, res) => {
             });
         }
 
-        // ✅ ACCEPT FLOW (SAFE)
+        // ✅ ACCEPT FLOW
         const ticket = await Ticket.findById(request.ticket);
-
         if (!ticket) {
             return res.status(404).json({ message: "Ticket not found" });
         }
 
-        // 🚫 Team size full check
+        // 🚫 Team full
         if (ticket.members.length >= ticket.teamSize) {
-            return res.status(400).json({
+            request.status = "CANCELLED";
+            await request.save();
+
+            return res.json({
+                status: false,
                 message: "Team is already full"
             });
         }
 
-        // 🚫 Already a member check (extra safety)
+        // 🚫 Already member
         if (ticket.members.includes(req.user._id)) {
-            return res.status(400).json({
+            safeInngestSend({
+                ticketId: ticket._id,
+                hackathonKey: ticket.hackathonKey,
+                joinedUserId: req.user._id
+            });
+
+            return res.json({
+                status: false,
                 message: "You are already part of this team"
             });
         }
-        // 🚫 Check if user is already in another team for this hackathon
+
+        // 🚫 Already in another team for same hackathon
         const existingTeam = await Ticket.findOne({
             hackathonKey: ticket.hackathonKey,
             members: req.user._id
         });
 
         if (existingTeam) {
-            // Update the request status to CANCELLED
             request.status = "CANCELLED";
             await request.save();
-            
-            await inngest.send({
-                name: "ticket/team.updated",
-                data: {
-                    ticketId: ticket._id.toString(),
-                    hackathonKey: ticket.hackathonKey,
-                    joinedUserId: req.user._id.toString()
-                }
+
+            safeInngestSend({
+                ticketId: ticket._id,
+                hackathonKey: ticket.hackathonKey,
+                joinedUserId: req.user._id
             });
-            return res.status(400).json({
-                message: "You have already joined another team for this hackathon. This request has been cancelled."
+
+            return res.json({
+                status: false,
+                message:
+                    "You have already joined another team for this hackathon. This request has been cancelled."
             });
         }
 
-        // ✅ Update request status
+        // ✅ Accept request
         request.status = "ACCEPTED";
         await request.save();
 
-        // ✅ Add user to team
+        // ✅ Add member to team
         await Ticket.findByIdAndUpdate(ticket._id, {
             $addToSet: { members: req.user._id }
         });
-        await inngest.send({
-            name: "ticket/team.updated",
-            data: {
-                ticketId: ticket._id.toString(),
-                hackathonKey: ticket.hackathonKey,
-                joinedUserId: req.user._id.toString()
-            }
+
+        // 🔔 Inngest (NON-BLOCKING)
+        safeInngestSend({
+            ticketId: ticket._id,
+            hackathonKey: ticket.hackathonKey,
+            joinedUserId: req.user._id
         });
+
         return res.json({
             status: true,
             message: "You have successfully joined the team"
         });
+
     } catch (error) {
+    
         res.status(500).json({
             status: false,
-            message: "Failed to respond to join request",
-            error: error.message
+            message: "Failed to respond to join request"
         });
     }
-
 };
+
 

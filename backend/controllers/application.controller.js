@@ -315,6 +315,7 @@ export const deleteApplication = async (req, res) => {
     await application.deleteOne();
 
     res.json({
+      status: true,
       message: "Application deleted successfully"
     });
 
@@ -323,6 +324,39 @@ export const deleteApplication = async (req, res) => {
 
     res.status(500).json({
       message: "Failed to delete application"
+    });
+  }
+};
+
+export const getSentApplications = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const applications = await Application.find({
+      applicant: userId,
+      status: { $in: ["PENDING"] }
+    })
+      .select("status createdAt ticket")
+      .populate({
+        path: "ticket",
+        select: "title hackathonName organization teamSize members createdBy description  location date ",
+        populate: {
+          path: "createdBy",
+          select: "name email collage branch year skills github linkedin phone"
+        }
+      })
+      .lean();
+
+    return res.status(200).json({
+      status: true,
+      count: applications.length,
+      applications
+    });
+  } catch (error) {
+    console.error("Get sent applications error:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Failed to fetch sent applications"
     });
   }
 };

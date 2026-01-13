@@ -71,6 +71,7 @@ export const UserProfileModal = ({ user, onClose }: any) => (
 
 // --- EXACT TEAM DETAIL UI ---
 export const TeamDetailModal = ({ team, teamMembers, isLoadingMembers, onClose, openMemberProfile, getInitial, activeTab, onOpenRecommendations }: any) => (
+    
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto" onClick={onClose}>
         <div className="bg-white w-full max-w-3xl rounded-[48px] p-6 sm:p-12 relative shadow-2xl text-black animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
             <button onClick={onClose} className="absolute top-6 sm:top-10 right-6 sm:right-10 p-3 hover:bg-gray-100 rounded-full transition-colors z-10"><X size={24} /></button>
