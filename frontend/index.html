@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hackoie – AI Team Builder</title>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="bg-[#fcfcfc] text-black font-sans">
+     <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #fcfcfc;
+      }
+      .bg-lime-custom {
+        background-color: #a3ff33;
+      }
+      .text-lime-custom {
+        color: #a3ff33;
+      }
+      .border-lime-custom {
+        border-color: #a3ff33;
+      }
+      .shadow-lime {
+        box-shadow: 0 0 20px rgba(163, 255, 51, 0.2);
+      }
+
+      /* Custom Scrollbar Styling - Very thin and silver */
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db; /* Silver/Light Gray */
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af; /* Slightly darker on hover */
+      }
+
+      /* Firefox support */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #d1d5db transparent;
+      }
+
+      Utility for non-standard scrollbars
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+    <div id="root"></div>
+
+    <!-- Vite entry point -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
