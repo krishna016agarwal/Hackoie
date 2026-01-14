@@ -11,20 +11,33 @@ import requestRouter from "../routes/application.routes.js"
 import joinRequestRoutes from "../routes/joinRequest.routes.js";
 dotenv.config();
 // import path from "path";
-import cors from "cors"
+// import cors from "cors"
 
 const app = express();
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: [
-      "https://hackoie-d4oo.vercel.app", // frontend
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-  })
-);
+const allowedOrigin =
+  process.env.FRONTEND_URL || "http://localhost:5173";
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  next();
+});
+
 
 connectDB();
 
