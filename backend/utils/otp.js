@@ -19,7 +19,7 @@ export const startSignup = async ({ name, email, password }) => {
       email,
       passwordHash: await bcrypt.hash(password, 10),
       otpHash: crypto.createHash("sha256").update(otp).digest("hex"),
-      otpExpiry: Date.now() + 5 * 60 * 1000,
+      otpExpiresAt: Date.now() + 5 * 60 * 1000,
       otpSendCount: 1,
       otpSendDate: new Date(),
       otpVerifyAttempts: 0
@@ -136,7 +136,7 @@ export const startSignup = async ({ name, email, password }) => {
     pending.name = name;
     pending.passwordHash = await bcrypt.hash(password, 10);
     pending.otpHash = crypto.createHash("sha256").update(otp).digest("hex");
-    pending.otpExpiry = Date.now() + 5 * 60 * 1000;
+    pending. otpExpiresAt = Date.now() + 5 * 60 * 1000;
     pending.otpSendCount += 1;
     pending.otpSendDate = new Date();
     pending.otpVerifyAttempts = 0;
@@ -164,7 +164,7 @@ export const verifySignupOTP = async (email, otp) => {
   }
 
   if (record.otpVerifyAttempts >= 5) {
-    await PendingUser.deleteOne({ email });
+    // await PendingUser.deleteOne({ email });
 
     throw new Error("Too many invalid attempts. Please register again.")
 

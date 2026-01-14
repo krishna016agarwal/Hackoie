@@ -1,7 +1,7 @@
 import JoinRequest from "../models/JoinRequest.js";
 import Ticket from "../models/ticket.js";
 import Recommendation from "../models/recommendation.js";
-import { inngest } from "../inngest/client.js";
+
 
 // 🚀 SEND REQUEST
 export const sendJoinRequest = async (req, res) => {
@@ -56,6 +56,7 @@ export const sendJoinRequest = async (req, res) => {
             joinRequest
         });
     } catch (err) {
+        console.log(err);
         if (err.code === 11000) {
             return res.status(400).json({
                 message: "Request already sent"
@@ -90,21 +91,7 @@ export const getReceivedJoinRequests = async (req, res) => {
 
 };
 
-const safeInngestSend = async ({ ticketId, hackathonKey, joinedUserId }) => {
-    try {
-        await inngest.send({
-            name: "ticket/team.updated",
-            data: {
-                ticketId: ticketId.toString(),
-                hackathonKey,
-                joinedUserId: joinedUserId.toString()
-            }
-        });
-    } catch (err) {
-        console.error("Inngest failed (ignored):", err.message);
-        // ❌ DO NOTHING — DB & API should continue
-    }
-};
+
 
 
 // 📤 RESPOND TO REQUEST
@@ -152,8 +139,7 @@ export const respondToJoinRequest = async (req, res) => {
 
         // 🚫 Team full
         if (ticket.members.length >= ticket.teamSize) {
-            request.status = "CANCELLED";
-            await request.save();
+            await JoinRequest.deleteOne({ _id: request._id });
 
             return res.json({
                 status: false,
@@ -163,11 +149,7 @@ export const respondToJoinRequest = async (req, res) => {
 
         // 🚫 Already member
         if (ticket.members.includes(req.user._id)) {
-            safeInngestSend({
-                ticketId: ticket._id,
-                hackathonKey: ticket.hackathonKey,
-                joinedUserId: req.user._id
-            });
+            await JoinRequest.deleteOne({ _id: request._id });
 
             return res.json({
                 status: false,
@@ -182,14 +164,10 @@ export const respondToJoinRequest = async (req, res) => {
         });
 
         if (existingTeam) {
-            request.status = "CANCELLED";
-            await request.save();
 
-            safeInngestSend({
-                ticketId: ticket._id,
-                hackathonKey: ticket.hackathonKey,
-                joinedUserId: req.user._id
-            });
+            await JoinRequest.deleteOne({ _id: request._id });
+
+
 
             return res.json({
                 status: false,
@@ -199,20 +177,14 @@ export const respondToJoinRequest = async (req, res) => {
         }
 
         // ✅ Accept request
-        request.status = "ACCEPTED";
-        await request.save();
+        await JoinRequest.deleteOne({ _id: request._id });
 
         // ✅ Add member to team
         await Ticket.findByIdAndUpdate(ticket._id, {
             $addToSet: { members: req.user._id }
         });
 
-        // 🔔 Inngest (NON-BLOCKING)
-        safeInngestSend({
-            ticketId: ticket._id,
-            hackathonKey: ticket.hackathonKey,
-            joinedUserId: req.user._id
-        });
+
 
         return res.json({
             status: true,

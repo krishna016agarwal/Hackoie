@@ -1,5 +1,4 @@
-import React from 'react';
-import { X, Code, Github, ExternalLink, Sparkles, Linkedin, Globe, Phone, Zap, Building2, Mail, MapPin, Calendar, Users,Trash2, Loader2 } from 'lucide-react';
+import { X, Code, Github, ExternalLink, Sparkles, Linkedin, Globe, Phone, Zap, Building2, Mail, MapPin, Calendar, Users, Trash2, Loader2 } from 'lucide-react';
 
 // --- EXACT SKILLS UI ---
 export const SkillsModal = ({ skills, onClose }: any) => (
@@ -78,8 +77,9 @@ export const TeamDetailModal = ({ team,
     getInitial,
     activeTab,
     onOpenRecommendations,
+    authUser, onLeaveTeam,onDeleteTeam,
     onRemoveMember }: any) => (
-    
+
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto" onClick={onClose}>
         <div className="bg-white w-full max-w-3xl rounded-[48px] p-6 sm:p-12 relative shadow-2xl text-black animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
             <button onClick={onClose} className="absolute top-6 sm:top-10 right-6 sm:right-10 p-3 hover:bg-gray-100 rounded-full transition-colors z-10"><X size={24} /></button>
@@ -109,48 +109,48 @@ export const TeamDetailModal = ({ team,
                             </div>
                         </div> */}
                         <div>
-    <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
-        Members
-    </h4>
+                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
+                                Members
+                            </h4>
 
-    <div className="flex flex-wrap gap-2">
-        {isLoadingMembers ? (
-            <Loader2 className="animate-spin" />
-        ) : (
-            teamMembers?.map((m: any) => (
-                <div
-                    key={m._id}
-                    className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100"
-                >
-                    <button
-                        onClick={() => openMemberProfile(m._id)}
-                        className="flex items-center gap-2"
-                    >
-                        <div className="w-5 h-5 rounded-full bg-black text-lime-custom flex items-center justify-center text-[7px] font-black">
-                            {getInitial(m.name)}
+                            <div className="flex flex-wrap gap-2">
+                                {isLoadingMembers ? (
+                                    <Loader2 className="animate-spin" />
+                                ) : (
+                                    teamMembers?.map((m: any) => (
+                                        <div
+                                            key={m._id}
+                                            className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100"
+                                        >
+                                            <button
+                                                onClick={() => openMemberProfile(m._id)}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <div className="w-5 h-5 rounded-full bg-black text-lime-custom flex items-center justify-center text-[7px] font-black">
+                                                    {getInitial(m.name)}
+                                                </div>
+                                                <span className="text-[10px] font-bold text-gray-600">
+                                                    {m.name}
+                                                </span>
+                                            </button>
+
+                                            {/* 🗑️ REMOVE MEMBER (ONLY FOR CREATED TAB) */}
+                                            {activeTab === 'created' && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onRemoveMember(m._id);
+                                                    }}
+                                                    className="ml-1 text-red-500 hover:text-red-700"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
                         </div>
-                        <span className="text-[10px] font-bold text-gray-600">
-                            {m.name}
-                        </span>
-                    </button>
-
-                    {/* 🗑️ REMOVE MEMBER (ONLY FOR CREATED TAB) */}
-                    {activeTab === 'created' && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onRemoveMember(m._id);
-                            }}
-                            className="ml-1 text-red-500 hover:text-red-700"
-                        >
-                            <Trash2 size={12} />
-                        </button>
-                    )}
-                </div>
-            ))
-        )}
-    </div>
-</div>
 
                     </div>
                     <div className="flex flex-col">
@@ -167,18 +167,39 @@ export const TeamDetailModal = ({ team,
                     </div>
                 </div>
                 <div className="pt-8 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
+                    {/* Hackathon Button */}
                     <button
                         className="flex-1 bg-gray-100 py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors text-sm"
-                        onClick={() => window.open(team.hackathonLink, "_blank")} // opens in a new tab
+                        onClick={() => window.open(team.hackathonLink, "_blank")}
                     >
                         Hackathon <ExternalLink size={16} />
                     </button>
 
-                    {/* SHOW MANAGE BROADCAST ONLY IN CREATED TAB
-                    {activeTab === 'created' && (
-                        <button className="flex-1 bg-black text-white py-4 rounded-full font-bold text-sm shadow-xl">Manage Broadcast</button>
-                    )} */}
+                    {/* Leave Team Button (only for joined tab) */}
+                    {activeTab === 'joined' && (
+                        <button
+                            className="flex-1 bg-red-50 text-red-600 py-4 rounded-full font-bold text-sm hover:bg-red-100 transition-colors"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onLeaveTeam(team._id); // call API to leave team
+                            }}
+                        >
+                            Leave Team
+                        </button>
+                    )}
+                       {activeTab === 'created' && (
+                        <button
+                            className="flex-1 bg-red-50 text-red-600 py-4 rounded-full font-bold text-sm hover:bg-red-100 transition-colors"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteTeam(team._id); // call API to delete team
+                            }}
+                        >
+                            Delete Team
+                        </button>
+                    )}
                 </div>
+
             </div>
         </div>
     </div>

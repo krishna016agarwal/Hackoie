@@ -8,12 +8,13 @@ import {
   getIncomingRequests,
   getHomeFeed,
   deleteTicket,
-  removeMemberFromTicket
+  removeMemberFromTicket,
+  leaveTicket
 } from "../controllers/ticket.controller.js";
 
 import { validateTicketBody } from "../middleware/validateTicket.js";
 import { ticketIpLimiter } from "../middleware/rateLimit.js";
-import {getTicketRecommendations} from "../controllers/recommendation.controller.js";
+import { getTicketRecommendations } from "../controllers/recommendation.controller.js";
 
 const router = express.Router();
 
@@ -27,6 +28,7 @@ router.get("/home", protect, getHomeFeed);
 router.delete("/ticket/:ticketId", protect, deleteTicket);
 router.delete("/:ticketId/member/:memberId", protect, removeMemberFromTicket);
 router.post("/link", protect, NormalizedLink);
-router.get("/ticket/:ticketId",protect,getTicketRecommendations);
+router.get("/ticket/:ticketId", protect, getTicketRecommendations);
+router.delete("/left", protect, leaveTicket);
 
 export default router;

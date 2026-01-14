@@ -9,9 +9,12 @@ import { inngest } from "../inngest/client.js";
  */
 
 export const createApplication = async (req, res) => {
+  let application = null;
+  let ticket = null;
+  let userId = null;
   try {
     const { ticketId } = req.body;
-    const userId = req.user._id;
+    userId = req.user._id;
     if (!req.user.isProfileComplete) {
       return res.status(403).json({
         message: "Complete your profile before sending requests"
@@ -22,7 +25,7 @@ export const createApplication = async (req, res) => {
       return res.status(400).json({ message: "Ticket ID is required" });
     }
 
-    const ticket = await Ticket.findById(ticketId);
+    ticket = await Ticket.findById(ticketId);
 
     if (!ticket) {
       return res.status(404).json({ message: "Ticket not found" });
@@ -52,7 +55,7 @@ export const createApplication = async (req, res) => {
     const existing = await Application.findOne({
       ticket: ticket._id,
       applicant: userId,
-      status: "PENDING"
+      status: { $in: ["PENDING", "REJECTED"] }
     });
 
     if (existing) {
@@ -62,21 +65,13 @@ export const createApplication = async (req, res) => {
     }
 
     // ✅ Create application
-    const application = await Application.create({
+    application = await Application.create({
       ticket: ticket._id,
       applicant: userId,
       hackathonKey: ticket.hackathonKey
     });
 
-    // 🔔 Notify admin (async)
-    await inngest.send({
-      name: "application.created",
-      data: {
-        ticketId: ticket._id.toString(),
-        adminId: ticket.createdBy.toString(),
-        applicantId: userId.toString()
-      }
-    });
+
 
     res.status(201).json({
       message: "Application sent successfully",
@@ -86,6 +81,21 @@ export const createApplication = async (req, res) => {
   } catch (error) {
     console.error("Create application error:", error);
     res.status(500).json({ message: "Server error" });
+  }
+  try {
+    if (application) {
+      // 🔔 Notify admin (async)
+      await inngest.send({
+        name: "application.created",
+        data: {
+          ticketId: ticket._id.toString(),
+          adminId: ticket.createdBy.toString(),
+          applicantId: userId.toString()
+        }
+      })
+    }
+  } catch (error) {
+    console.error("Post-commit side-effect failed:", error);
   }
 };
 
@@ -157,15 +167,23 @@ export const updateApplicationStatus = async (req, res) => {
     if (status === "ACCEPTED") {
 
       // 🔐 HARD BLOCK
-      const alreadyAccepted = await Application.findOne({
-        applicant: application.applicant,
+
+      // 🔍 CHECK: Is user already in ANY team for this hackathon?
+      const alreadyInTeam = await Ticket.findOne({
         hackathonKey: application.hackathonKey,
-        status: "ACCEPTED"
+        members: application.applicant
       }).session(session);
 
-      if (alreadyAccepted) {
+      await Application.deleteOne(
+        {
+          _id: application._id
+
+        }
+      ).session(session);
+
+      if (alreadyInTeam) {
         throw new Error(
-          "User already joined another team for this hackathon"
+          "User is already part of a team for this hackathon"
         );
       }
 
@@ -186,27 +204,27 @@ export const updateApplicationStatus = async (req, res) => {
       );
 
       if (!updatedTicket) {
-        throw new Error("Team is already full or ticket is closed");
+        res.json({ status: false, message: "Team is already full. Cannot accept more members." });
+
       }
 
-      // 🔁 Reject all other applications
-      await Application.updateMany(
+
+    } else {
+
+      /**
+       * 5️⃣ Update current application
+       */
+      await Application.updateOne(
         {
-          applicant: application.applicant,
-          hackathonKey: application.hackathonKey,
-          status: "PENDING",
-          _id: { $ne: application._id }
+          _id: application._id,
+          status: "PENDING"
         },
-        { $set: { status: "REJECTED" } },
+        {
+          $set: { status: "REJECTED" }
+        },
         { session }
       );
     }
-
-    /**
-     * 5️⃣ Update current application
-     */
-    application.status = status;
-    await application.save({ session });
 
     /**
      * 6️⃣ Commit transaction

@@ -92,9 +92,9 @@ export const createTicket = async (req, res) => {
       createdBy: req.user._id,
       members: [req.user._id]
     });
-   
+
     if (req.body.requirementsText && req.body.requirementsText.length > 0) {
-      await findMatchingUsers( finalRequirements,req.user._id,ticket._id,ticket.hackathonKey);
+      await findMatchingUsers(finalRequirements, req.user._id, ticket._id, ticket.hackathonKey);
 
     }
 
@@ -237,7 +237,7 @@ export const getHomeFeed = async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .populate("createdBy", "name college")
-       .populate("members", "name college branch year skills github linkedin phone email")
+      .populate("members", "name college branch year skills github linkedin phone email")
       .limit(50);
 
     /**
@@ -260,8 +260,9 @@ export const getHomeFeed = async (req, res) => {
 
 export const deleteTicket = async (req, res) => {
   try {
+
     const { ticketId } = req.params;
-    const { userId } = req.user._id;
+    const  userId  = req.user._id;
 
     const ticket = await Ticket.findById(ticketId);
 
@@ -299,7 +300,7 @@ export const deleteTicket = async (req, res) => {
 
 export const removeMemberFromTicket = async (req, res) => {
   let ticket = null;
-  let ticketid2 = null;
+  
   let memberid2 = null;
 
   try {
@@ -308,7 +309,7 @@ export const removeMemberFromTicket = async (req, res) => {
 
     ticket = await Ticket.findById(ticketId);
     memberid2 = memberId;
-    ticketid2 = ticketId
+   
     if (!ticket) {
       return res.status(404).json({
         status: false,
@@ -376,14 +377,68 @@ export const removeMemberFromTicket = async (req, res) => {
       await inngest.send({
         name: "member.kicked",
         data: {
-          memberid2,
-          ticketid2: ticket._id.toString()
+          userId:memberid2,
+          ticketId: ticket._id.toString()
         }
       });
     }
   } catch (error) {
     console.error("Post-commit side-effect failed:", error);
   }
+};
+
+
+
+
+export const leaveTicket = async (req, res) => {
+  let ticket = null;
+  let userId2 = null;
+
+  try {
+    const { ticketId } = req.body; // frontend sends { ticketId }
+    const userId = req.user._id;   // token-based auth middleware
+
+    ticket = await Ticket.findById(ticketId);
+    userId2 = userId.toString();
+
+    if (!ticket) {
+      return res.status(404).json({
+        status: false,
+        message: "Ticket not found"
+      });
+    }
+
+    if (!ticket.members.includes(userId)) {
+      return res.status(400).json({
+        status: false,
+        message: "You are not a member of this ticket"
+      });
+    }
+
+    // Remove user from members
+    ticket.members = ticket.members.filter(
+      id => id.toString() !== userId2
+    );
+
+    await ticket.save();
+
+
+
+    res.json({
+      status: true,
+      message: "You have left the ticket successfully",
+      members: ticket.members
+    });
+
+  } catch (error) {
+    console.error("Leave ticket error:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Failed to leave ticket"
+    });
+  }
+
+
 };
 
 // export const getTicketWithStatusClosed = async (req, res) => {

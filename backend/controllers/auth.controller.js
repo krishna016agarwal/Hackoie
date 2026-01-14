@@ -7,7 +7,7 @@ import { startSignup, verifySignupOTP } from "../utils/otp.js";
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-console.log(name, email, password)
+
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({
@@ -36,7 +36,7 @@ export const verifyOtpAndRegister = async (req, res) => {
     const { email, otp } = req.body;
 
     const pendingUser = await verifySignupOTP(email, otp);
-console.log(pendingUser)
+
     const user = await User.create({
       name: pendingUser.name,
       email: pendingUser.email,
@@ -61,7 +61,7 @@ console.log(pendingUser)
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-console.log(email, password)
+
   const user = await User.findOne({ email });
   if (!user)
     return res.status(401).json({ message: "User doesn't exist" });

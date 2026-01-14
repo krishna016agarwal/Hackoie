@@ -247,7 +247,7 @@ const Profile: React.FC = () => {
 
             if (data.status) {
                 setMessage(data.message);   // popup shown
-              
+
                 fetchTeamMembers(selectedTeam._id);
                 setMemberRemoved(true); // 🔔 trigger useEffect
             } else {
@@ -271,7 +271,55 @@ const Profile: React.FC = () => {
         return () => clearTimeout(timer);
     }, [memberRemoved]);
 
+    const handleLeaveTeam = async (ticketId: string) => {
+        try {
+            const res = await fetch(`${API_URL}/api/tickets/left`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${auth.token}`
+                },
+                body: JSON.stringify({ ticketId })
+            });
 
+            const data = await res.json();
+
+            if (data.status) {
+                setMessage(data.message);
+                fetchJoined();          // refresh joined teams
+                if (selectedTeam?._id === ticketId) setSelectedTeam(null); // close modal if open
+            } else {
+                setError(data.message || 'Failed to leave team');
+            }
+        } catch (err) {
+            setError('Failed to leave team');
+        }
+    };
+
+    const handledeleteTeam = async (ticketId: string) => {
+        try {
+            const res = await fetch(`${API_URL}/api/tickets/ticket/${ticketId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${auth.token}`
+                },
+                body: JSON.stringify({ ticketId })
+            });
+
+            const data = await res.json();
+            if (data.status) {
+                setMessage(data.message);
+                fetchCreated();
+                if (selectedTeam?._id === ticketId) setSelectedTeam(null); // close modal if open
+
+            } else {
+                setError(data.message || 'Failed to delete team');
+            }
+        } catch (err) {
+            setError('Failed to leave team');
+        }
+    };
 
 
     return (
@@ -466,6 +514,9 @@ const Profile: React.FC = () => {
                         handleFetchRecommendations(selectedTeam._id)
                     }
                     onRemoveMember={handleRemoveMember}
+                    authUser={auth.user}              // ✅ Pass current user
+                    onLeaveTeam={handleLeaveTeam}
+                    onDeleteTeam={handledeleteTeam}    // ✅ Pass delete function
                 />
             )}
 
