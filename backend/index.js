@@ -10,7 +10,7 @@ import { serve } from "inngest/express";
 import requestRouter from "./routes/application.routes.js"
 import joinRequestRoutes from "./routes/joinRequest.routes.js";
 dotenv.config();
-// import { sendMail } from "./utils/sendEmail.js";
+// import path from "path";
 import cors from "cors"
 
 const app = express();
@@ -21,7 +21,7 @@ connectDB();
 
 const PORT = process.env.PORT || 5000;
 
-
+// const _dirname = path.resolve();
 
 
 app.use("/api/auth", authRoutes);
@@ -34,8 +34,13 @@ app.use(
     functions: functions
   })
 );
+
+// app.use(express.static(path.join(_dirname, "/frontend/dist")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve(_dirname, "frontend","dist","index.html"));
+// });
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+ // console.log(`Server running on port ${PORT}`);
 });
 
 // sendMail("krishna016agarwal@gmail.com","Hackoie", `<h2>Hello </h2>

@@ -5,7 +5,7 @@ import { TeamDetailModal, UserProfileModal, SkillsModal, AIRecommendationsModal 
 import { Layers, UserPlus, Send, Archive, UserCheck, Building2, Loader2, Sparkles, Trash2 } from 'lucide-react';
 import type { User } from '../../types';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'; 
 
 const Profile: React.FC = () => {
     const { auth, updateProfile, setMessage, setError } = useAuth();

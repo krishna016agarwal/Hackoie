@@ -3,7 +3,7 @@ import { useAuth } from '../App';
 import { Search, MapPin, Calendar, Users, Sparkles, X, Building2, ExternalLink, Loader2 } from 'lucide-react';
 import { UserProfileModal } from './profile/Modals';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'; 
 
 const Dashboard: React.FC = () => {
   const { auth, setMessage, setError } = useAuth();

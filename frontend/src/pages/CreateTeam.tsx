@@ -3,7 +3,7 @@ import { useAuth } from '../App';
 import { Link as LinkIcon, Sparkles, Send, Info, Lock, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'; 
 
 const CreateTeam: React.FC = () => {
   const { auth, setError, setMessage } = useAuth();

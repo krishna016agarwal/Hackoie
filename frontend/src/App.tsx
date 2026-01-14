@@ -13,7 +13,7 @@ import Navbar from './components/Navbar';
 import Popup from './components/Popup';
 import type { AuthState, User } from './types';
 
-const API_URL = 'http://localhost:3000'; 
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'; 
 
 interface AuthContextType {
   auth: AuthState;
