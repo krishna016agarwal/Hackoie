@@ -80,7 +80,7 @@ export const createApplication = async (req, res) => {
 
 
     res.status(201).json({
-      sttaus:true,
+      status:true,
       message: "Application sent successfully",
       application
     });
