@@ -59,7 +59,8 @@ export const createApplication = async (req, res) => {
     });
 
     if (existing) {
-      return res.status.json({
+      return res.json({
+        status:false,
         message: "You have already applied to this ticket"
       });
     }
