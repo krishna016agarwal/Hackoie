@@ -11,13 +11,15 @@ export const register = async (req, res) => {
     const exists = await User.findOne({ email });
     if (exists) {
       return res.json({
+        status:false,
         message: "User already exists"
       });
     }
 
     await startSignup({ name, email, password });
 
-    res.json({status:false,
+    res.json({
+      status:true,
       message: "OTP sent to email"
     });
   } catch (error) {
@@ -46,7 +48,8 @@ export const verifyOtpAndRegister = async (req, res) => {
 
     await PendingUser.deleteOne({ email });
 
-    res.status(201).json({status:false,
+    res.status(201).json({
+      status:true,
       token: generateToken(user._id),
       user
     });
@@ -70,7 +73,8 @@ export const login = async (req, res) => {
   if (!isMatch)
     return res.json({status:false, message: "Invalid credentials" });
 
-  res.json({status:false,
+  res.json({
+    status:true,
     token: generateToken(user._id),
     user
   });
@@ -79,10 +83,12 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     res.json({
+      status:true,
       message: "Logged out successfully"
     });
   } catch (error) {
     res.json({
+      status:false, 
       message: "Logout failed"
     });
   }

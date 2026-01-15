@@ -17,12 +17,14 @@ export const createApplication = async (req, res) => {
     userId = req.user._id;
     if (!req.user.isProfileComplete) {
       return res.json({
+        status:false,
         message: "Complete your profile before sending requests"
       });
     }
 
     if (!ticketId) {
-      return res.json({ message: "Ticket ID is required" });
+      
+      return res.json({ status:false,message: "Ticket ID is required" });
     }
 
     ticket = await Ticket.findById(ticketId);
@@ -33,6 +35,7 @@ export const createApplication = async (req, res) => {
 
     if (ticket.status !== "OPEN") {
       return res.json({
+        status:false,
         message: "This ticket is no longer accepting applications"
       });
     }
@@ -40,6 +43,7 @@ export const createApplication = async (req, res) => {
     // ❌ Own ticket
     if (ticket.createdBy.toString() === userId.toString()) {
       return res.json({
+        status:false,
         message: "You cannot apply to your own ticket"
       });
     }
@@ -47,6 +51,7 @@ export const createApplication = async (req, res) => {
     // ❌ Already a member
     if (ticket.members.some(m => m.toString() === userId.toString())) {
       return res.json({
+        status:false,
         message: "You are already a member of this team"
       });
     }
@@ -82,7 +87,7 @@ export const createApplication = async (req, res) => {
 
   } catch (error) {
     console.error("Create application error:", error);
-    res.json({ message: "Server error" });
+    res.json({status:false, message: "Server error" });
   }
   try {
     if (application) {
@@ -252,6 +257,7 @@ export const updateApplicationStatus = async (req, res) => {
     console.error("Transaction error:", error);
 
     return res.json({
+      sttus:false,
       message: error.message || "Operation failed"
     });
   }
@@ -320,7 +326,7 @@ export const deleteApplication = async (req, res) => {
      * 2️⃣ Authorization
      */
     if (application.applicant.toString() !== userId.toString()) {
-      return res.json({
+      return res.json({status:false,
         message: "You are not authorized to delete this application"
       });
     }
@@ -329,7 +335,7 @@ export const deleteApplication = async (req, res) => {
      * 3️⃣ Business rule
      */
     if (application.status !== "PENDING") {
-      return res.json({
+      return res.json({status:false,
         message: "Only pending applications can be deleted"
       });
     }
@@ -348,6 +354,7 @@ export const deleteApplication = async (req, res) => {
     console.error("Delete application error:", error);
 
     res.json({
+      status:false,
       message: "Failed to delete application"
     });
   }

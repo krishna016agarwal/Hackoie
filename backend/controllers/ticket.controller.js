@@ -13,6 +13,7 @@ import { findMatchingUsers } from "../utils/findMatchingUsers.js";
 export const createTicket = async (req, res) => {
   if (!req.user.isProfileComplete) {
     return res.json({
+      status:false,
       message: "Complete your profile before creating a ticket"
     });
   }
@@ -30,11 +31,12 @@ export const createTicket = async (req, res) => {
 
     if (alreadyInHackathon) {
       return res.json({
+        status:false, 
         message: "You are already part of a team for this hackathon"
       });
     }
     if (!hackathonKey) {
-      return res.json({ message: "Invalid hackathon data" });
+      return res.status(404).json({ message: "Invalid hackathon data" });
     }
 
     const alreadyTicketFormed = await Ticket.findOne({
@@ -46,6 +48,7 @@ export const createTicket = async (req, res) => {
 
     if (alreadyTicketFormed) {
       return res.json({
+        status:false, 
         message: "You have already created a ticket for this Hackathon"
       });
     }
@@ -101,7 +104,7 @@ export const createTicket = async (req, res) => {
     res.status(201).json({ status: true, message: "Ticket created successfully", ticket });
 
   } catch (error) {
-    res.json({
+    res.status(404).json({
       status: false,
       message: "Failed to create ticket",
       error: error.message
@@ -138,7 +141,7 @@ export const getMyCreatedTickets = async (req, res) => {
 
     res.json(ticketsWithRequests);
   } catch (error) {
-    res.json({
+    res.status(404).json({
       status: false,
       message: "Failed to fetch created tickets",
       error: error.message
@@ -243,14 +246,16 @@ export const getHomeFeed = async (req, res) => {
     /**
      * 4️⃣ Response
      */
-    res.json({status:false,
+    res.json({
+      status:true,
       matchedTickets,
       otherTickets
     });
 
   } catch (err) {
     console.error("Home feed error:", err);
-    res.json({status:false,
+    res.status(404).json({status:
+      false,
       message: "Failed to load home feed"
     });
   }
@@ -275,7 +280,7 @@ export const deleteTicket = async (req, res) => {
 
     // ✅ Only creator can delete
     if (ticket.createdBy.toString() !== userId.toString()) {
-      return res.json({
+      return res.status(404).json({
         status: false,
         message: "You are not authorized to delete this ticket"
       });
@@ -290,7 +295,7 @@ export const deleteTicket = async (req, res) => {
 
   } catch (error) {
     console.error("Delete ticket error:", error);
-    res.json({
+    res.status(404).json({
       status: false,
       message: "Failed to delete ticket"
     });
@@ -318,7 +323,7 @@ export const removeMemberFromTicket = async (req, res) => {
     }
 
     if (ticket.createdBy.toString() !== userId.toString()) {
-      return res.json({
+      return res.status(404).json({
         status: false,
         message: "Only admin can remove members"
       });
@@ -332,7 +337,7 @@ export const removeMemberFromTicket = async (req, res) => {
     }
 
     if (!ticket.members.includes(memberId)) {
-      return res.json({
+      return res.status(404).json({
         status: false,
         message: "User is not a member of this ticket"
       });
@@ -365,7 +370,7 @@ export const removeMemberFromTicket = async (req, res) => {
 
   } catch (error) {
     console.error("Remove member error:", error);
-    return res.json({
+    return res.status(404).json({
       status: false,
       message: "Failed to remove member"
     });

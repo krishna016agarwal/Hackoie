@@ -46,7 +46,7 @@ export const updateProfile = async (req, res) => {
     });
 
   } catch (err) {
-    return res.json({ error: err.message });
+    return res.status(404).json({ error: err.message });
   }
 };
 
@@ -58,5 +58,5 @@ export const getMembersProfile = async (req, res) => {
   if (!ticket) {
     return res.status(404).json({ message: "Ticket not found" });
   }
-  res.json({ members: ticket.members });
+  res.json({ status:true,members: ticket.members });
 };

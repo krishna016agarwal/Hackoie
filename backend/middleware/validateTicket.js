@@ -3,12 +3,14 @@ export const validateTicketBody = (req, res, next) => {
 
   if (!title || title.length < 5) {
     return res.json({
+      status:false, 
       message: "Invalid ticket title"
     });
   }
 
   if (requirementsText && requirementsText.length > 100) {
     return res.json({
+      status:false,
       message: "Requirements too long"
     });
   }

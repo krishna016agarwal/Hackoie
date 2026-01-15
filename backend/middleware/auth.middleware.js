@@ -14,12 +14,13 @@ export const protect = async (req, res, next) => {
 
     } catch (error) {
      
-      return res.json({
+      return res.status(404).json({
+        status:false,
         message: "Session expired. Please login again.",
         
       });
     }
   } else {
-    res.json({ message: "No token provided" });
+    res.status(404).json({ status:false, message: "No token provided" });
   }
 };
