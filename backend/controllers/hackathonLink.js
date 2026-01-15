@@ -46,7 +46,7 @@ export const NormalizedLink = async (req, res) => {
         return res.json({ status: true, normalizedUrl, hackathonKey, cleanData });
 
     } catch (err) {
-        return res.status(400).json({
+        return res.json({
             status: false,
             error: err.message || "Invalid URL"
         });

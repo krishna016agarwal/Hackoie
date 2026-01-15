@@ -16,7 +16,7 @@ export const getTicketRecommendations = async (req, res) => {
         }
 
         if (ticket.createdBy.toString() !== userId.toString()) {
-            return res.status(403).json({
+            return res.json({
                 status: false,
                 message: "You are not authorized to view recommendations"
             });
@@ -53,7 +53,7 @@ export const getTicketRecommendations = async (req, res) => {
         });
     } catch (error) {
         console.error("Get recommendations error:", error);
-        res.status(500).json({
+        res.json({
             status: false,
             message: "Failed to fetch recommendations"
         });

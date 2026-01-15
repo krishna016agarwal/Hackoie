@@ -12,7 +12,7 @@ import { findMatchingUsers } from "../utils/findMatchingUsers.js";
  */
 export const createTicket = async (req, res) => {
   if (!req.user.isProfileComplete) {
-    return res.status(403).json({
+    return res.json({
       message: "Complete your profile before creating a ticket"
     });
   }
@@ -29,12 +29,12 @@ export const createTicket = async (req, res) => {
 
 
     if (alreadyInHackathon) {
-      return res.status(400).json({
+      return res.json({
         message: "You are already part of a team for this hackathon"
       });
     }
     if (!hackathonKey) {
-      return res.status(400).json({ message: "Invalid hackathon data" });
+      return res.json({ message: "Invalid hackathon data" });
     }
 
     const alreadyTicketFormed = await Ticket.findOne({
@@ -45,7 +45,7 @@ export const createTicket = async (req, res) => {
 
 
     if (alreadyTicketFormed) {
-      return res.status(400).json({
+      return res.json({
         message: "You have already created a ticket for this Hackathon"
       });
     }
@@ -101,7 +101,7 @@ export const createTicket = async (req, res) => {
     res.status(201).json({ status: true, message: "Ticket created successfully", ticket });
 
   } catch (error) {
-    res.status(500).json({
+    res.json({
       status: false,
       message: "Failed to create ticket",
       error: error.message
@@ -138,7 +138,7 @@ export const getMyCreatedTickets = async (req, res) => {
 
     res.json(ticketsWithRequests);
   } catch (error) {
-    res.status(500).json({
+    res.json({
       status: false,
       message: "Failed to fetch created tickets",
       error: error.message
@@ -250,7 +250,7 @@ export const getHomeFeed = async (req, res) => {
 
   } catch (err) {
     console.error("Home feed error:", err);
-    res.status(500).json({
+    res.json({
       message: "Failed to load home feed"
     });
   }
@@ -275,7 +275,7 @@ export const deleteTicket = async (req, res) => {
 
     // ✅ Only creator can delete
     if (ticket.createdBy.toString() !== userId.toString()) {
-      return res.status(403).json({
+      return res.json({
         status: false,
         message: "You are not authorized to delete this ticket"
       });
@@ -290,7 +290,7 @@ export const deleteTicket = async (req, res) => {
 
   } catch (error) {
     console.error("Delete ticket error:", error);
-    res.status(500).json({
+    res.json({
       status: false,
       message: "Failed to delete ticket"
     });
@@ -318,21 +318,21 @@ export const removeMemberFromTicket = async (req, res) => {
     }
 
     if (ticket.createdBy.toString() !== userId.toString()) {
-      return res.status(403).json({
+      return res.json({
         status: false,
         message: "Only admin can remove members"
       });
     }
 
     if (memberId === userId.toString()) {
-      return res.status(400).json({
+      return res.json({
         status: false,
         message: "Admin cannot remove himself"
       });
     }
 
     if (!ticket.members.includes(memberId)) {
-      return res.status(400).json({
+      return res.json({
         status: false,
         message: "User is not a member of this ticket"
       });
@@ -365,7 +365,7 @@ export const removeMemberFromTicket = async (req, res) => {
 
   } catch (error) {
     console.error("Remove member error:", error);
-    return res.status(500).json({
+    return res.json({
       status: false,
       message: "Failed to remove member"
     });
@@ -409,7 +409,7 @@ export const leaveTicket = async (req, res) => {
     }
 
     if (!ticket.members.includes(userId)) {
-      return res.status(400).json({
+      return res.json({
         status: false,
         message: "You are not a member of this ticket"
       });
@@ -432,7 +432,7 @@ export const leaveTicket = async (req, res) => {
 
   } catch (error) {
     console.error("Leave ticket error:", error);
-    return res.status(500).json({
+    return res.json({
       status: false,
       message: "Failed to leave ticket"
     });

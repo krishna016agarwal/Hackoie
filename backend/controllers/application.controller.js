@@ -16,13 +16,13 @@ export const createApplication = async (req, res) => {
     const { ticketId } = req.body;
     userId = req.user._id;
     if (!req.user.isProfileComplete) {
-      return res.status(403).json({
+      return res.json({
         message: "Complete your profile before sending requests"
       });
     }
 
     if (!ticketId) {
-      return res.status(400).json({ message: "Ticket ID is required" });
+      return res.json({ message: "Ticket ID is required" });
     }
 
     ticket = await Ticket.findById(ticketId);
@@ -32,21 +32,21 @@ export const createApplication = async (req, res) => {
     }
 
     if (ticket.status !== "OPEN") {
-      return res.status(400).json({
+      return res.json({
         message: "This ticket is no longer accepting applications"
       });
     }
 
     // ❌ Own ticket
     if (ticket.createdBy.toString() === userId.toString()) {
-      return res.status(400).json({
+      return res.json({
         message: "You cannot apply to your own ticket"
       });
     }
 
     // ❌ Already a member
     if (ticket.members.some(m => m.toString() === userId.toString())) {
-      return res.status(400).json({
+      return res.json({
         message: "You are already a member of this team"
       });
     }
@@ -59,7 +59,7 @@ export const createApplication = async (req, res) => {
     });
 
     if (existing) {
-      return res.status(400).json({
+      return res.status.json({
         message: "You have already applied to this ticket"
       });
     }
@@ -80,7 +80,7 @@ export const createApplication = async (req, res) => {
 
   } catch (error) {
     console.error("Create application error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.json({ message: "Server error" });
   }
   try {
     if (application) {
@@ -249,7 +249,7 @@ export const updateApplicationStatus = async (req, res) => {
 
     console.error("Transaction error:", error);
 
-    return res.status(400).json({
+    return res.json({
       message: error.message || "Operation failed"
     });
   }
@@ -318,7 +318,7 @@ export const deleteApplication = async (req, res) => {
      * 2️⃣ Authorization
      */
     if (application.applicant.toString() !== userId.toString()) {
-      return res.status(403).json({
+      return res.json({
         message: "You are not authorized to delete this application"
       });
     }
@@ -327,7 +327,7 @@ export const deleteApplication = async (req, res) => {
      * 3️⃣ Business rule
      */
     if (application.status !== "PENDING") {
-      return res.status(400).json({
+      return res.json({
         message: "Only pending applications can be deleted"
       });
     }
@@ -345,7 +345,7 @@ export const deleteApplication = async (req, res) => {
   } catch (error) {
     console.error("Delete application error:", error);
 
-    res.status(500).json({
+    res.json({
       message: "Failed to delete application"
     });
   }
@@ -377,7 +377,7 @@ export const getSentApplications = async (req, res) => {
     });
   } catch (error) {
     console.error("Get sent applications error:", error);
-    return res.status(500).json({
+    return res.json({
       status: false,
       message: "Failed to fetch sent applications"
     });

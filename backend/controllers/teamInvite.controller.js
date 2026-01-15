@@ -12,7 +12,7 @@ export const sendTeamInvite = async (req, res) => {
   }
 
   if (ticket.createdBy.toString() !== adminId.toString()) {
-    return res.status(403).json({ message: "Unauthorized" });
+    return res.json({ message: "Unauthorized" });
   }
 
   const invite = await TeamInvite.create({

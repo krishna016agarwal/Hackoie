@@ -9,7 +9,7 @@ export const sendJoinRequest = async (req, res) => {
         const { ticketId, userId } = req.body;
         const requesterId = req.user._id;
         if (!req.user.isProfileComplete) {
-            return res.status(403).json({
+            return res.json({
                 message: "Complete your profile before sending reuests"
             });
         }
@@ -20,17 +20,17 @@ export const sendJoinRequest = async (req, res) => {
         }
 
         if (ticket.createdBy.toString() !== requesterId.toString()) {
-            return res.status(403).json({ message: "Not authorized" });
+            return res.json({ message: "Not authorized" });
         }
 
         // 2️⃣ Prevent sending request to self
         if (userId.toString() === requesterId.toString()) {
-            return res.status(400).json({ message: "Cannot invite yourself" });
+            return res.json({ message: "Cannot invite yourself" });
         }
 
         // 3️⃣ Prevent requesting existing member
         if (ticket.members.includes(userId)) {
-            return res.status(400).json({ message: "User already in team" });
+            return res.json({ message: "User already in team" });
         }
 
         // 4️⃣ Get recommendation data (optional but powerful)
@@ -58,13 +58,13 @@ export const sendJoinRequest = async (req, res) => {
     } catch (err) {
      //   console.log(err);
         if (err.code === 11000) {
-            return res.status(400).json({
+            return res.json({
                 message: "Request already sent"
             });
         }
 
         console.error(err);
-        res.status(500).json({ message: "Failed to send request" });
+        res.json({ message: "Failed to send request" });
     }
 };
 
@@ -82,7 +82,7 @@ export const getReceivedJoinRequests = async (req, res) => {
 
         res.json({ status: true, requests });
     } catch (error) {
-        res.status(500).json({
+        res.json({
             status: false,
             message: "Failed to fetch join requests",
             error: error.message
@@ -100,7 +100,7 @@ export const respondToJoinRequest = async (req, res) => {
         const { requestId, status } = req.body;
 
         if (!["ACCEPTED", "REJECTED"].includes(status)) {
-            return res.status(400).json({ message: "Invalid action" });
+            return res.json({ message: "Invalid action" });
         }
 
         const request = await JoinRequest.findById(requestId);
@@ -110,12 +110,12 @@ export const respondToJoinRequest = async (req, res) => {
 
         // 🔐 Only receiver can respond
         if (request.requestedTo.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: "Unauthorized" });
+            return res.json({ message: "Unauthorized" });
         }
 
         // ❌ Prevent double action
         if (request.status !== "PENDING") {
-            return res.status(400).json({
+            return res.json({
                 message: `Request already ${request.status.toLowerCase()}`
             });
         }
@@ -193,7 +193,7 @@ export const respondToJoinRequest = async (req, res) => {
 
     } catch (error) {
 
-        res.status(500).json({
+        res.json({
             status: false,
             message: "Failed to respond to join request"
         });

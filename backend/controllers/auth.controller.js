@@ -10,7 +10,7 @@ export const register = async (req, res) => {
 
     const exists = await User.findOne({ email });
     if (exists) {
-      return res.status(400).json({
+      return res.json({
         message: "User already exists"
       });
     }
@@ -21,7 +21,7 @@ export const register = async (req, res) => {
       message: "OTP sent to email"
     });
   } catch (error) {
-    res.status(400).json({
+    res.json({
       message: error.message
     });
   }
@@ -51,7 +51,7 @@ export const verifyOtpAndRegister = async (req, res) => {
       user
     });
   } catch (error) {
-    res.status(400).json({
+    res.json({
       message: error.message
     });
   }
@@ -64,11 +64,11 @@ export const login = async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user)
-    return res.status(401).json({ message: "User doesn't exist" });
+    return res.json({ message: "User doesn't exist" });
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch)
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.json({ message: "Invalid credentials" });
 
   res.json({
     token: generateToken(user._id),
@@ -82,7 +82,7 @@ export const logout = async (req, res) => {
       message: "Logged out successfully"
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Logout failed"
     });
   }

@@ -46,7 +46,7 @@ export const updateProfile = async (req, res) => {
     });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.json({ error: err.message });
   }
 };
 
