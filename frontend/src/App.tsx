@@ -56,7 +56,7 @@ const App: React.FC = () => {
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Login failed');
+      if (!response.status) throw new Error(data.message || 'Login failed');
 
       setAuth({ user: data.user, token: data.token });
       setMessage('Welcome back!');
@@ -75,7 +75,7 @@ const App: React.FC = () => {
         body: JSON.stringify(userData),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Signup failed');
+      if (!response.status) throw new Error(data.message || 'Signup failed');
       
       sessionStorage.setItem('pending_email', userData.email || '');
       setMessage('OTP sent to your email!');
@@ -94,7 +94,7 @@ const App: React.FC = () => {
         body: JSON.stringify({ email, otp }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Invalid OTP');
+      if (!response.status) throw new Error(data.message || 'Invalid OTP');
 
       setAuth({ user: data.user, token: data.token });
       sessionStorage.removeItem('pending_email');

@@ -75,6 +75,7 @@ export const createApplication = async (req, res) => {
 
 
     res.status(201).json({
+      sttaus:true,
       message: "Application sent successfully",
       application
     });

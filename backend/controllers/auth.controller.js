@@ -17,11 +17,11 @@ export const register = async (req, res) => {
 
     await startSignup({ name, email, password });
 
-    res.json({
+    res.json({status:false,
       message: "OTP sent to email"
     });
   } catch (error) {
-    res.json({
+    res.json({status:false,
       message: error.message
     });
   }
@@ -46,12 +46,12 @@ export const verifyOtpAndRegister = async (req, res) => {
 
     await PendingUser.deleteOne({ email });
 
-    res.status(201).json({
+    res.status(201).json({status:false,
       token: generateToken(user._id),
       user
     });
   } catch (error) {
-    res.json({
+    res.json({status:false,
       message: error.message
     });
   }
@@ -64,13 +64,13 @@ export const login = async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user)
-    return res.json({ message: "User doesn't exist" });
+    return res.json({status:false, message: "User doesn't exist" });
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch)
-    return res.json({ message: "Invalid credentials" });
+    return res.json({status:false, message: "Invalid credentials" });
 
-  res.json({
+  res.json({status:false,
     token: generateToken(user._id),
     user
   });

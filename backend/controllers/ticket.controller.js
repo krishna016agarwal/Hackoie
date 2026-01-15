@@ -243,14 +243,14 @@ export const getHomeFeed = async (req, res) => {
     /**
      * 4️⃣ Response
      */
-    res.json({
+    res.json({status:false,
       matchedTickets,
       otherTickets
     });
 
   } catch (err) {
     console.error("Home feed error:", err);
-    res.json({
+    res.json({status:false,
       message: "Failed to load home feed"
     });
   }

@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
         });
         const data = await response.json();
         
-        if (response.ok) {
+        if (response.status) {
           // Combine matched tickets first, then other tickets
           const combined = [...(data.matchedTickets || []), ...(data.otherTickets || [])];
           setTeams(combined);
@@ -54,7 +54,7 @@ const Dashboard: React.FC = () => {
       });
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.status) {
         setMessage(data.message || "Application sent successfully!");
         setSelectedTeam(null);
       } else {
