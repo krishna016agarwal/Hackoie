@@ -4,7 +4,11 @@
   {
    "src": "api/index.js",
    "use": "@vercel/node",
-   "config": { "includeFiles": ["dist/**"] }
+   "config": { 
+     "includeFiles": ["dist/**"],
+     "memory": 1024,
+     "maxDuration": 60
+   }
   }
  ],
  "routes": [
