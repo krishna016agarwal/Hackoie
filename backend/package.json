@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon api/index.js",
-    "build":"npm install && npm install --prefix frontend && npm run build --prefix frontend",
-    "start":"node backend/index.js",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/index.js",
     "inngest-dev": "npx inngest-cli@latest dev"
   },
   "keywords": [],
@@ -15,9 +15,11 @@
   "description": "",
   "dependencies": {
     "@inngest/agent-kit": "^0.13.2",
+    "@sparticuz/chromium": "^143.0.4",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cheerio": "^1.1.2",
+    "chrome-aws-lambda": "^10.1.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -27,6 +29,7 @@
     "mongoose": "^9.1.1",
     "nodemailer": "^7.0.12",
     "playwright": "^1.57.0",
+    "playwright-core": "^1.57.0",
     "resend": "^6.6.0",
     "sib-api-v3-sdk": "^8.5.0"
   }

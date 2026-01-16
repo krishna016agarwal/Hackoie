@@ -25,7 +25,7 @@ const Dashboard: React.FC = () => {
           headers: { 'Authorization': `Bearer ${auth.token}` }
         });
         const data = await response.json();
-        
+    
         if (data.status) {
           // Combine matched tickets first, then other tickets
           const combined = [...(data.matchedTickets || []), ...(data.otherTickets || [])];
