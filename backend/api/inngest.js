@@ -1,4 +1,5 @@
-import { serve } from "inngest/express";
+// import { serve } from "inngest/express";
+import { serve } from "inngest/vercel";
 import { inngest } from "../inngest/client.js";
 import { functions } from "../inngest/index.js";
 
