@@ -93,21 +93,10 @@ export const TeamDetailModal = ({ team,
                         <div className="flex items-center gap-2 text-base sm:text-lg text-gray-600 font-bold"><Building2 size={20} className="text-lime-600" /> {team.organization}</div>
                         <div className="space-y-3 text-gray-700 text-sm font-medium">
                             <div className="flex items-center gap-3"><MapPin size={18} /> {team.location}</div>
-                            <div className="flex items-center gap-3"><Calendar size={18} /> {new Date(team.createdAt).toLocaleDateString()}</div>
+                            <div className="flex items-center gap-3"><Calendar size={18} /> {new Date(team.date).toLocaleDateString()}</div>
                             <div className="flex items-center gap-3"><Users size={18} /> {team.members?.length} / {team.teamSize} Slots</div>
                         </div>
-                        {/* <div>
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Members</h4>
-                            <div className="flex flex-wrap gap-2">
-                                {isLoadingMembers ? <Loader2 className="animate-spin" /> : teamMembers?.map((m: any, idx: number) => (
-                                    <button key={idx} onClick={() => openMemberProfile(m._id)} className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 hover:bg-lime-custom/10 transition-colors">
-                                        <div className="w-5 h-5 rounded-full bg-black text-lime-custom flex items-center justify-center text-[7px] font-black">{getInitial(m.name)}</div>
-                                        <span className="text-[10px] font-bold text-gray-600">{m.name}</span>
-                                    </button>
-                                ))}
-                                
-                            </div>
-                        </div> */}
+                      
                         <div>
                             <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
                                 Members

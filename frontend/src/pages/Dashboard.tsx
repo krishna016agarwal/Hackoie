@@ -128,7 +128,7 @@ const Dashboard: React.FC = () => {
                      {team.hackathonName}
                    </div>
                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest pt-1">
-                      {new Date(team.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(team.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                    </span>
                 </div>
                 
@@ -212,7 +212,7 @@ const Dashboard: React.FC = () => {
                         <MapPin size={20} className="text-lime-600" /> {selectedTeam.location}
                      </li>
                      <li className="flex items-center gap-4 text-gray-700 font-bold text-sm">
-                        <Calendar size={20} className="text-lime-600" /> {new Date(selectedTeam.createdAt).toLocaleDateString()}
+                        <Calendar size={20} className="text-lime-600" /> {new Date(selectedTeam.date).toLocaleDateString()}
                      </li>
                      <li className="flex items-center gap-4 text-gray-700 font-bold text-sm">
                         <Users size={20} className="text-lime-600" /> {selectedTeam.members?.length} / {selectedTeam.teamSize} Members
