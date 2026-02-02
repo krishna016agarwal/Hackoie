@@ -3,8 +3,6 @@
 Hackoie is a **collaborative hackathon team-building platform** that helps participants find the right teammates based on **skills, requirements, and intent**.  
 It removes randomness from team formation and enables **structured, secure, and intelligent collaboration** for hackathons and innovation challenges.
 
-***website*** - https://hackoie-d4oo.vercel.app
-
 ---
 
 ## 🌟 About Hackoie
