@@ -86,7 +86,12 @@ export const createTicket = async (req, res) => {
         ? requirements
         : [];
 
-
+if(req.body.date<Date.now()) {
+   return res.status(404).json({
+        message:
+          "Hackathon is Expired"
+      });
+}
     const ticket = await Ticket.create({
       ...req.body,
       description: finalDescription,
