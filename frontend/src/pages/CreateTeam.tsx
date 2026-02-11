@@ -124,7 +124,7 @@ const CreateTeam: React.FC = () => {
         <span className="font-bold text-gray-600 tracking-widest uppercase text-xs">AI Powered Team Generation</span>
       </div>
       
-      <h1 className="text-5xl font-bold tracking-tighter mb-4">Start a new project.</h1>
+      <h1 className="text-5xl font-bold tracking-tighter mb-4">Make your own Team.</h1>
       <p className="text-gray-600 text-lg mb-12">Enter the hackathon link and our AI will fetch the details.</p>
 
       <form onSubmit={handleSubmit} className="space-y-12">
