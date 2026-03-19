@@ -3,7 +3,6 @@
 Hackoie is a **collaborative hackathon team-building platform** that helps participants find the right teammates based on **skills, requirements, and intent**.  
 It removes randomness from team formation and enables **structured, secure, and intelligent collaboration** for hackathons and innovation challenges.
 
----
 
 ## 🌟 About Hackoie
 
@@ -50,9 +49,24 @@ Instead of spamming groups or relying on luck, Hackoie ensures:
     - College
     - Academic year
     - Profile strength
+- Role-gap awareness:
+  - Recommends candidates that complete missing roles (AI / Frontend / Backend / Designer / Pitch)
+  - Avoids over-indexing on already-covered skills
 - Admin can:
   - Review suggested profiles
   - Send team join requests
+
+---
+
+### GitHub Skill Proofreading (New)
+- Users can run **GitHub verification** from profile
+- System analyzes public repositories, languages, topics, stars, activity recency
+- Generates:
+  - Verification score (0-100)
+  - Confidence level (low/medium/high)
+  - Inferred skills
+  - Summary insight for team leaders
+- Team leaders can view this signal inside profile popups while shortlisting teammates
 
 ---
 
@@ -116,6 +130,25 @@ Each user gets a personalized dashboard showing:
 
 ---
 
+## 🔧 Environment Setup
+
+Create a `.env` file inside `backend/` with:
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+- `MONGODB_URL=<your_mongodb_connection_string>`
+- `JWT_SECRET=<your_jwt_secret>`
+- `PORT=3000` (optional)
+- `GITHUB_TOKEN=<optional_personal_access_token_for_higher_rate_limits>`
+- `MONGO_DNS_SERVERS=8.8.8.8,1.1.1.1` (optional; helps on networks where SRV DNS is blocked)
+
+Without `MONGODB_URL`, backend startup will fail by design.
+
+---
+
 ## 🧩 Database Models
 
 - User
@@ -151,7 +184,11 @@ Accepted Users Join the Team
 
 ## 🏆 Why Hackoie?
 
+- Eliminates manual outreach across multiple platforms
 - Requirement-based teammate matching
+- Role-gap matching to build balanced teams
+- Context-aware personalized discovery feed
+- Skill-verified candidate discovery using GitHub proof signals
 - Controlled and secure team invitations
 - Anti-spam and fair-play enforcement
 - Clean, professional product UX

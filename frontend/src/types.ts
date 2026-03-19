@@ -1,6 +1,28 @@
 
+export interface GithubVerification {
+  status: 'not_provided' | 'verified' | 'error';
+  score: number;
+  confidence: 'low' | 'medium' | 'high' | string;
+  summary: string;
+  username?: string;
+  inferredSkills?: string[];
+  analyzedAt?: string;
+  profile?: {
+    publicRepos?: number;
+    followers?: number;
+    following?: number;
+    accountAgeYears?: number;
+    totalStars?: number;
+    totalForks?: number;
+    activeRepos?: number;
+    topLanguages?: Array<{ language: string; count: number }>;
+    topTopics?: Array<{ topic: string; count: number }>;
+  } | null;
+}
+
 export interface User {
   id: string;
+  _id?: string;
   name: string;
   email: string;
   about?: string;
@@ -11,7 +33,9 @@ export interface User {
   github?: string;
   linkedin?: string;
   phone?: string;
+  contactNo?: string;
   devfolio?: string;
+  githubVerification?: GithubVerification;
   isProfileComplete: boolean;
   isAdmin?: boolean;
 }

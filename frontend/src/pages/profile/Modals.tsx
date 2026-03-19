@@ -1,4 +1,8 @@
-import { X, Code, Github, ExternalLink, Sparkles, Linkedin, Globe, Phone, Zap, Building2, Mail, MapPin, Calendar, Users, Trash2, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Code, Github, ExternalLink, Sparkles, Linkedin, Globe, Phone, Zap, Building2, Mail, MapPin, Calendar, Users, Trash2, Loader2, ShieldCheck } from 'lucide-react';
+import { useAuth } from '../../App';
+
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 // --- EXACT SKILLS UI ---
 export const SkillsModal = ({ skills, onClose }: any) => (
@@ -28,45 +32,113 @@ export const SkillsModal = ({ skills, onClose }: any) => (
 );
 
 // --- EXACT USER PROFILE UI ---
-export const UserProfileModal = ({ user, onClose }: any) => (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[700] flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
-        <div className="bg-white w-full max-w-lg rounded-[48px] p-8 sm:p-12 text-center relative text-black shadow-2xl animate-in fade-in slide-in-from-bottom duration-300" onClick={e => e.stopPropagation()}>
-            <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20} /></button>
-            <h2 className="text-3xl font-bold mb-1 tracking-tighter">{user.name}</h2>
-            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs mb-4">
-                {[user.college, user.branch, user.year]
-                    .filter(Boolean)
-                    .join(" • ")}
-            </p>
-            {/* Branch and Year display */}
+export const UserProfileModal = ({ user, onClose }: any) => {
+    const { auth } = useAuth();
+    const [githubProof, setGithubProof] = useState<any>(user?.githubVerification || null);
+    const [isLoadingProof, setIsLoadingProof] = useState(false);
 
-            <div className="flex justify-center gap-4 mb-1">
-                {user.github && <a href={user.github} target="_blank" className="p-3 bg-gray-50 rounded-2xl hover:bg-black hover:text-white transition-all transform hover:-translate-y-1"><Github size={20} /></a>}
-                {user.linkedin && <a href={user.linkedin} target="_blank" className="p-3 bg-gray-50 rounded-2xl hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1"><Linkedin size={20} /></a>}
-                {user.devfolio && <a href={user.devfolio} target="_blank" className="p-3 bg-gray-50 rounded-2xl hover:bg-[#3770FF] hover:text-white transition-all transform hover:-translate-y-1"><Globe size={20} /></a>}
-            </div>
-            <div className="flex justify-center items-center gap-3 text-gray-500 font-bold ">
-                {user?.phone && (
-                    <div className="flex items-center gap-3">
-                        <Phone size={20} className="text-lime-600" />
-                        <span>{user.phone}</span>
+    const proofStatusTone =
+        githubProof?.status === 'verified'
+            ? 'bg-lime-custom/20 text-lime-700'
+            : githubProof?.status === 'error'
+                ? 'bg-red-50 text-red-600'
+                : 'bg-gray-100 text-gray-500';
+
+    useEffect(() => {
+        const fetchProof = async () => {
+            const userId = user?._id || user?.id;
+            if (!userId || !auth.token) return;
+
+            setIsLoadingProof(true);
+            try {
+                const res = await fetch(`${API_URL}/api/auth/users/${userId}/github-proofread`, {
+                    headers: { Authorization: `Bearer ${auth.token}` }
+                });
+                const data = await res.json();
+                if (data.status) {
+                    setGithubProof(data.githubVerification || null);
+                }
+            } catch {
+                setGithubProof(null);
+            } finally {
+                setIsLoadingProof(false);
+            }
+        };
+
+        fetchProof();
+    }, [user?._id, user?.id, auth.token]);
+
+    return (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[700] flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
+            <div className="bg-white w-full max-w-lg rounded-[48px] p-8 sm:p-12 text-center relative text-black shadow-2xl animate-in fade-in slide-in-from-bottom duration-300" onClick={e => e.stopPropagation()}>
+                <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20} /></button>
+                <h2 className="text-3xl font-bold mb-1 tracking-tighter">{user.name}</h2>
+                <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs mb-4">
+                    {[user.college, user.branch, user.year]
+                        .filter(Boolean)
+                        .join(" • ")}
+                </p>
+
+                <div className="flex justify-center gap-4 mb-1">
+                    {user.github && <a href={user.github} target="_blank" className="p-3 bg-gray-50 rounded-2xl hover:bg-black hover:text-white transition-all transform hover:-translate-y-1"><Github size={20} /></a>}
+                    {user.linkedin && <a href={user.linkedin} target="_blank" className="p-3 bg-gray-50 rounded-2xl hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1"><Linkedin size={20} /></a>}
+                    {user.devfolio && <a href={user.devfolio} target="_blank" className="p-3 bg-gray-50 rounded-2xl hover:bg-[#3770FF] hover:text-white transition-all transform hover:-translate-y-1"><Globe size={20} /></a>}
+                </div>
+                <div className="flex justify-center items-center gap-3 text-gray-500 font-bold ">
+                    {user?.phone && (
+                        <div className="flex items-center gap-3">
+                            <Phone size={20} className="text-lime-600" />
+                            <span>{user.phone}</span>
+                        </div>
+                    )}
+                    <div className="flex items-center gap-3"><Mail size={20} className="text-lime-600" /> <span>{user.email}</span></div>
+                </div>
+                <div className="flex flex-col items-center gap-2 mb-6 text-xs sm:text-sm font-medium text-gray-600">
+                    {user.contactNo && <div className="flex items-center gap-2"><Phone size={14} className="text-lime-600" /> {user.contactNo}</div>}
+                </div>
+
+                <div className="mb-6 rounded-2xl border border-gray-100 bg-gray-50 p-4 text-left">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500">
+                            <ShieldCheck size={14} className="text-lime-600" /> GitHub Skill Signal
+                        </div>
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${proofStatusTone}`}>
+                            {githubProof?.status || 'not provided'}
+                        </span>
                     </div>
-                )}
-                {/* Added Email Display as requested */}
-                <div className="flex items-center gap-3"><Mail size={20} className="text-lime-600" /> <span>{user.email}</span></div>
-            </div>
-            <div className="flex flex-col items-center gap-2 mb-6 text-xs sm:text-sm font-medium text-gray-600">
-                {user.contactNo && <div className="flex items-center gap-2"><Phone size={14} className="text-lime-600" /> {user.contactNo}</div>}
-            </div>
-            <div className="flex flex-wrap justify-center gap-2 mb-8 max-h-32 overflow-y-auto custom-scrollbar p-2 bg-gray-50 rounded-2xl">
-                {user.skills?.map((s: any) => (<span key={s} className="px-3 py-1.5 bg-white border border-gray-100 rounded-full text-[9px] font-bold uppercase tracking-wider text-black shadow-sm">{s}</span>))}
-            </div>
 
+                    {isLoadingProof ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-500"><Loader2 size={14} className="animate-spin" /> analyzing...</div>
+                    ) : (
+                        <>
+                            <div className="flex items-end gap-2 mb-1">
+                                <span className="text-2xl font-black text-black">{githubProof?.score ?? 0}</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">/ 100</span>
+                                <span className="ml-auto text-[10px] font-bold uppercase tracking-widest text-gray-500">{githubProof?.confidence || 'low'} confidence</span>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-2">{githubProof?.summary || 'No GitHub verification available.'}</p>
+                            {githubProof?.inferredSkills?.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5">
+                                    {githubProof.inferredSkills.slice(0, 6).map((skill: string) => (
+                                        <span key={skill} className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-white border border-gray-100 text-black">
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
 
-            <button onClick={onClose} className="w-full bg-black text-white py-4 rounded-full font-bold hover:bg-black/90 transition-colors shadow-lg">Close</button>
+                <div className="flex flex-wrap justify-center gap-2 mb-8 max-h-32 overflow-y-auto custom-scrollbar p-2 bg-gray-50 rounded-2xl">
+                    {user.skills?.map((s: any) => (<span key={s} className="px-3 py-1.5 bg-white border border-gray-100 rounded-full text-[9px] font-bold uppercase tracking-wider text-black shadow-sm">{s}</span>))}
+                </div>
+
+                <button onClick={onClose} className="w-full bg-black text-white py-4 rounded-full font-bold hover:bg-black/90 transition-colors shadow-lg">Close</button>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // --- EXACT TEAM DETAIL UI ---
 export const TeamDetailModal = ({ team,
@@ -77,7 +149,7 @@ export const TeamDetailModal = ({ team,
     getInitial,
     activeTab,
     onOpenRecommendations,
-    authUser, onLeaveTeam,onDeleteTeam,
+    onLeaveTeam,onDeleteTeam,
     onRemoveMember }: any) => (
 
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto" onClick={onClose}>
