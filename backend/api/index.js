@@ -19,13 +19,13 @@ const app = express();
 /* -------------------- MIDDLEWARE -------------------- */
 app.use(express.json());
 
-/* ✅ CORS – FINAL FIX */
+
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
       "https://hackoie.vercel.app",
-      /\.vercel\.app$/   // ✅ allows ALL Vercel preview deployments
+      /\.vercel\.app$/   
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
