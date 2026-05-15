@@ -23,7 +23,7 @@ export const NormalizedLink = async (req, res) => {
             return res.json({ status: false, text: "Unsupported URL protocol" });
         }
         const normalizedUrl = normalizeUrl(url);
-
+        
         if (!normalizedUrl) return res.json({ status: false, text: "Error in normalizing the url" });
 
         const hackathonKey = generateHackathonKey(normalizedUrl);

@@ -5,6 +5,7 @@ export const normalizeUrl = (input) => {
 
   try {
     url = new URL(input);
+ 
   } catch (err) {
     throw new Error("Invalid URL");
   }

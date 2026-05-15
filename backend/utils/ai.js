@@ -11,7 +11,7 @@ const analyzeTicketRequirementsAndDescription = async (requirementsText) => {
 
   const agent = createAgent({
     model: gemini({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash",
       apiKey: process.env.GEMINI_API_KEY
     }),
     name: "Hackathon Requirement & Description Generator",
