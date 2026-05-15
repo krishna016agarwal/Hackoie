@@ -3,15 +3,13 @@ import Application from "../../models/Application.js";
 import JoinRequest from "../../models/JoinRequest.js";
 import { collectUniqueUsers } from "../../utils/uniqueUsers.js";
 import { inngest } from "../client.js";
-import { sendEmail } from "../../utils/sendEmail.js.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 
 export const expireOldTickets = inngest.createFunction(
     {
         id: "expire-old-tickets",
-        concurrency: { limit: 1 }
-    },
-    {
-        cron: "0 0 * * *" // every day at midnight
+        concurrency: { limit: 1 },
+        triggers: [{ cron: "0 0 * * *" }]
     },
     async ({ step }) => {
         const now = new Date();

@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import PendingUser from "../models/pendingUser.js";
-import { sendEmail } from "../utils/sendEmail.js.js"
+import { sendEmail } from "./sendEmail.js"
 import bcrypt from "bcrypt";
 const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();

@@ -1,11 +1,13 @@
 import { inngest } from "../client.js";
 import User from "../../models/user.js";
 import Ticket from "../../models/ticket.js";
-import { sendEmail } from "../../utils/sendEmail.js.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 
 export const sendApplicationRequestMail = inngest.createFunction(
-  { id: "send-application-request-mail" },
-  { event: "application.created" },
+  {
+    id: "send-application-request-mail",
+    triggers: [{ event: "application.created" }],
+  },
   async ({ event }) => {
     const { adminId, applicantId, ticketId } = event.data;
 

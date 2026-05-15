@@ -1,10 +1,12 @@
 import User from "../../models/user.js"
 import Ticket from "../../models/ticket.js";
 import { inngest } from "../client.js";
-import { sendEmail } from "../../utils/sendEmail.js.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 export const sendMemberKickedMail = inngest.createFunction(
-    { id: "send-member-kicked-mail" },
-    { event: "member.kicked" },
+    { id: "send-member-kicked-mail",
+      triggers:[{event:"member.kicked"}],
+     },
+    
     async ({ event }) => {
         const { userId, ticketId } = event.data;
 
