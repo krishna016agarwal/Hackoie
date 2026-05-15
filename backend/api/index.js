@@ -24,9 +24,7 @@ app.use(
   cors({
     origin: [
       process.env.FRONTEND_URL,
-      "http://localhost:5173",
-      "https://hackoie.vercel.app",
-      /\.vercel\.app$/   
+      "http://localhost:5173", 
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -50,14 +48,10 @@ app.use(
     functions,
   })
 );
-const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 /* -------------------- EXPORT -------------------- */
 export default app;
