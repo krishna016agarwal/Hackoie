@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit3, Save, Phone, Mail, Github, Linkedin, Globe, Plus, Loader2, GraduationCap, Building2, MapPin } from 'lucide-react';
+import { Edit3, Save, Phone, Mail, Github, Linkedin, Globe, Plus, Loader2 } from 'lucide-react';
 import type { User } from '../../types';
 
 interface ProfileHeaderProps {

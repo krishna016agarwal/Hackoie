@@ -91,6 +91,36 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false
+  },
+
+  githubVerification: {
+    status: {
+      type: String,
+      enum: ["not_provided", "verified", "error"],
+      default: "not_provided"
+    },
+    score: {
+      type: Number,
+      default: 0
+    },
+    confidence: {
+      type: String,
+      default: "low"
+    },
+    summary: {
+      type: String,
+      default: "No verification run yet."
+    },
+    username: String,
+    inferredSkills: {
+      type: [String],
+      default: []
+    },
+    profile: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
+    },
+    analyzedAt: Date
   }
 
 }, { timestamps: true });

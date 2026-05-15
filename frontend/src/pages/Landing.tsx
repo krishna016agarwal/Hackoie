@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Zap, Target, Users, Sparkles, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { ArrowRight, Zap, Target, Users, Sparkles, Github, Twitter, Linkedin, Mail, ShieldCheck } from 'lucide-react';
 
 const Landing: React.FC = () => {
   const getInitial = (name?: string) => (name ? name.charAt(0).toUpperCase() : '?');
@@ -30,10 +30,10 @@ const Landing: React.FC = () => {
             <span className="font-medium text-gray-600">The Future of Hackathon Team Building</span>
           </div>
           <h1 className="text-6xl lg:text-8xl font-bold leading-tight tracking-tighter mb-8 text-black">
-            Build the <span className="relative">Ultimate<span className="absolute bottom-4 left-0 w-full h-4 bg-lime-custom/30 -z-10"></span></span> Squard.
+            Build the <span className="relative">Ultimate<span className="absolute bottom-4 left-0 w-full h-4 bg-lime-custom/30 -z-10"></span></span> Squad.
           </h1>
           <p className="text-xl text-gray-600 max-w-lg mb-10 leading-relaxed">
-            Hackoie is the AI-driven platform where developers connect instantly. Our matching engine pairs you with hackers who complement your skills, background, and ambition.
+            Hackoie is the AI-driven platform where developers connect instantly. Our matching engine closes role-gaps, validates real skill signals, and forms balanced teams without manual outreach.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/signup" className="bg-black text-white px-10 py-5 rounded-full font-bold text-lg flex items-center justify-center gap-2 group hover:shadow-xl hover:bg-black/90 transition-all">
@@ -100,27 +100,34 @@ const Landing: React.FC = () => {
 
       {/* Stats/Feature Highlights */}
       <section className="bg-black text-white py-24 px-10">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-16">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="space-y-4">
             <div className="w-12 h-12 bg-lime-custom/20 rounded-2xl flex items-center justify-center">
               <Sparkles className="text-lime-custom" />
             </div>
-            <h3 className="text-2xl font-bold">AI Scraping</h3>
-            <p className="text-gray-400">Paste a hackathon link and we'll automatically extract all details, dates, and requirements using our AI engine.</p>
+            <h3 className="text-2xl font-bold">No Manual Searching</h3>
+            <p className="text-gray-400">One platform for discovery, matching, and joining. No cross-platform cold outreach or DM spam loops.</p>
           </div>
           <div className="space-y-4">
             <div className="w-12 h-12 bg-lime-custom/20 rounded-2xl flex items-center justify-center">
               <Target className="text-lime-custom" />
             </div>
-            <h3 className="text-2xl font-bold">Precision Matching</h3>
-            <p className="text-gray-400">Our algorithm prioritizes users who match your specific skill requirements and academic background first.</p>
+            <h3 className="text-2xl font-bold">Role-Gap Matching</h3>
+            <p className="text-gray-400">Detects missing roles in your team and recommends complementary candidates instead of similar duplicates.</p>
           </div>
           <div className="space-y-4">
             <div className="w-12 h-12 bg-lime-custom/20 rounded-2xl flex items-center justify-center">
               <Users className="text-lime-custom" />
             </div>
-            <h3 className="text-2xl font-bold">Fast Formation</h3>
-            <p className="text-gray-400">Go from idea to full team in minutes. Less time recruiting, more time building pixel-perfect realities.</p>
+            <h3 className="text-2xl font-bold">Balanced Team Engine</h3>
+            <p className="text-gray-400">Context-aware recommendations use user skills, team composition, and hackathon requirements to complete strong squads.</p>
+          </div>
+          <div className="space-y-4">
+            <div className="w-12 h-12 bg-lime-custom/20 rounded-2xl flex items-center justify-center">
+              <ShieldCheck className="text-lime-custom" />
+            </div>
+            <h3 className="text-2xl font-bold">Skill Verification</h3>
+            <p className="text-gray-400">GitHub proofread analyzes activity, projects, and inferred skills to reduce false claims and improve match reliability.</p>
           </div>
         </div>
       </section>

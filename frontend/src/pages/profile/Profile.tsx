@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../App';
 import { ProfileHeader } from './ProfileHeader';
 import { TeamDetailModal, UserProfileModal, SkillsModal, AIRecommendationsModal } from './Modals';
-import { Layers, UserPlus, Send, Archive, UserCheck, Building2, Loader2, Sparkles, Trash2 } from 'lucide-react';
+import { Layers, UserPlus, Send, Archive, UserCheck, Building2, Loader2, Sparkles, Trash2, ShieldCheck } from 'lucide-react';
 import type { User } from '../../types';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'; 
@@ -39,10 +39,16 @@ const Profile: React.FC = () => {
     const [showRecModal, setShowRecModal] = useState(false);
     const [recommendations, setRecommendations] = useState<any[]>([]);
     const [isLoadingRecs, setIsLoadingRecs] = useState(false);
+    const [isSyncingGithub, setIsSyncingGithub] = useState(false);
+    const [githubProof, setGithubProof] = useState<any>(auth.user?.githubVerification || null);
 
     const [editForm, setEditForm] = useState<User>({ ...auth.user! });
 
     const getInitial = (name?: string) => (name ? name.charAt(0).toUpperCase() : '?');
+
+    useEffect(() => {
+        setGithubProof(auth.user?.githubVerification || null);
+    }, [auth.user]);
 
     // 1. Fetch Data Logic
     useEffect(() => {
@@ -231,6 +237,36 @@ const Profile: React.FC = () => {
         finally { setIsUpdating(false); }
     };
 
+    const handleSyncGithubProofread = async () => {
+        setIsSyncingGithub(true);
+        try {
+            const res = await fetch(`${API_URL}/api/auth/profile/github-proofread`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${auth.token}`
+                }
+            });
+            const data = await res.json();
+
+            if (data.status) {
+                setGithubProof(data.githubVerification);
+                if (auth.user) {
+                    updateProfile({
+                        ...auth.user,
+                        githubVerification: data.githubVerification
+                    });
+                }
+                setMessage('GitHub skill verification updated.');
+            } else {
+                setError(data.message || 'GitHub verification failed');
+            }
+        } catch {
+            setError('GitHub verification failed');
+        } finally {
+            setIsSyncingGithub(false);
+        }
+    };
+
     const handleRemoveMember = async (memberId: string) => {
         try {
             const res = await fetch(
@@ -331,6 +367,50 @@ const Profile: React.FC = () => {
                 getInitial={getInitial} SKILL_LIMIT={8} setShowAllSkills={setShowAllSkills}
                 handleSkillsChange={(e: any) => setEditForm({ ...editForm, skills: e.target.value.split(',').map((s: any) => s.trim()) })}
             />
+
+            <div className="bg-white rounded-[40px] border border-gray-100 p-6 sm:p-8 mb-10 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
+                    <div>
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                            <ShieldCheck size={14} className="text-lime-600" /> GitHub Skill Verification
+                        </div>
+                        <p className="text-sm text-gray-600">Verifies your GitHub activity and infers practical strengths for better team matching.</p>
+                    </div>
+                    <button
+                        onClick={handleSyncGithubProofread}
+                        disabled={isSyncingGithub}
+                        className="px-6 py-3 bg-black text-white rounded-full font-bold text-xs uppercase tracking-widest hover:bg-black/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                        {isSyncingGithub ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                        {isSyncingGithub ? 'Analyzing...' : 'Run Proofread'}
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+                    <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Verification Score</p>
+                        <p className="text-2xl font-black text-black">{githubProof?.score ?? 0}<span className="text-sm text-gray-400"> / 100</span></p>
+                    </div>
+                    <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Confidence</p>
+                        <p className="text-lg font-bold text-black">{githubProof?.confidence || 'low'}</p>
+                    </div>
+                    <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 md:col-span-2">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Insight</p>
+                        <p className="text-sm text-gray-700">{githubProof?.summary || 'Add your GitHub profile and run proofread to validate skills.'}</p>
+                    </div>
+                </div>
+
+                {githubProof?.inferredSkills?.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {githubProof.inferredSkills.slice(0, 8).map((skill: string) => (
+                            <span key={skill} className="px-3 py-1.5 bg-lime-custom/20 text-lime-700 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                {skill}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="flex gap-6 sm:gap-12 border-b border-gray-100 mb-8 overflow-x-auto no-scrollbar scroll-smooth px-2">
                 {[{ id: 'joined', label: 'Joined', icon: Layers }, { id: 'incoming', label: 'Incoming', icon: UserPlus }, { id: 'sent', label: 'Sent', icon: Send }, { id: 'created', label: 'Created', icon: Archive }, { id: 'friends', label: 'Friend Request', icon: UserCheck }].map(tab => (
@@ -514,9 +594,8 @@ const Profile: React.FC = () => {
                         handleFetchRecommendations(selectedTeam._id)
                     }
                     onRemoveMember={handleRemoveMember}
-                    authUser={auth.user}              // ✅ Pass current user
                     onLeaveTeam={handleLeaveTeam}
-                    onDeleteTeam={handledeleteTeam}    // ✅ Pass delete function
+                    onDeleteTeam={handledeleteTeam}
                 />
             )}
 

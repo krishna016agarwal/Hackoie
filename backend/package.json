@@ -4,9 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon api/index.js",
+    "dev": "nodemon server.js",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "node backend/index.js",
+    "start": "node server.js",
     "inngest-dev": "npx inngest-cli@latest dev"
   },
   "keywords": [],

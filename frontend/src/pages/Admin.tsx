@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../App';
 import { 
-  Users, Layers, Ticket, Search, User as UserIcon, Trash2, X, Github, Linkedin, 
-  Globe, Phone, Zap, ShieldAlert, MoreVertical, Building2, MapPin, Calendar, 
-  ExternalLink, Code, Mail, Clock, AlertTriangle, CheckCircle2 
+  Users, Layers, Ticket, Search, Trash2, X, Github, Linkedin,
+  Globe, Phone, Zap, ShieldAlert, MapPin, Calendar,
+  ExternalLink, Mail, Clock, AlertTriangle, CheckCircle2
 } from 'lucide-react';
 import type{ User, Team, Request } from '../types';
 
@@ -14,7 +14,7 @@ interface AdminTeam extends Team {
 }
 
 const Admin: React.FC = () => {
-  const { auth, setMessage } = useAuth();
+  const { setMessage } = useAuth();
   const [activeTab, setActiveTab] = useState<'users' | 'teams' | 'tickets' | 'expired'>('users');
   const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<AdminTeam[]>([]);
@@ -200,7 +200,7 @@ const Admin: React.FC = () => {
                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">{team.organizationName}</p>
                    <div className="flex items-center justify-between pt-6 border-t border-gray-50">
                       <div className="flex -space-x-2">
-                         {team.members.map((m, idx) => (
+                         {team.members.map((_, idx) => (
                            <div key={idx} className="w-8 h-8 rounded-full border-2 border-white bg-black flex items-center justify-center shadow-sm text-lime-custom text-[10px] font-black">
                               {getInitial()}
                            </div>
